@@ -60,7 +60,11 @@ void huansic_ble_init() {
 	USART_Cmd(UART6, ENABLE);
 }
 
-__huansic_ble_received(uint8_t data){
+void huansic_ble_AT(uint8_t enter) {
+	GPIO_WriteBit(GPIOE, GPIO_Pin_13, enter ? Bit_RESET : Bit_SET);		// LOW for AT mode
+}
+
+__huansic_ble_received(uint8_t data) {
 
 }
 
