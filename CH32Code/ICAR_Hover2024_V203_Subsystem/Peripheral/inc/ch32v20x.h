@@ -29,7 +29,7 @@ extern "C" {
 #if defined(CH32V20x_D8) || defined(CH32V20x_D8W)
   #define HSE_VALUE    ((uint32_t)32000000) /* Value of the External oscillator in Hz */
 #else
-  #define HSE_VALUE    ((uint32_t)8000000) /* Value of the External oscillator in Hz */
+  #define HSE_VALUE    ((uint32_t)12000000) /* Value of the External oscillator in Hz */
 #endif
 
 /* In the following line adjust the External High Speed oscillator (HSE) Startup Timeout value */

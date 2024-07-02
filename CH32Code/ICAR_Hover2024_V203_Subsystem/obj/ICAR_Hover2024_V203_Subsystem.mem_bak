@@ -1,0 +1,31 @@
+.text
+	|	0x00000100	|	__riscv_save_12             	|	FUNC  	|	0x30
+	|	0x00000108	|	__riscv_save_8              	|	FUNC  	|	0x28
+	|	0x00000116	|	__riscv_save_7              	|	FUNC  	|	0x1a
+	|	0x00000130	|	__riscv_save_1              	|	FUNC  	|	0xc
+	|	0x0000013c	|	__riscv_restore_12          	|	FUNC  	|	0x24
+	|	0x00000140	|	__riscv_restore_10          	|	FUNC  	|	0x20
+	|	0x0000014a	|	__riscv_restore_5           	|	FUNC  	|	0x16
+	|	0x00000154	|	__riscv_restore_3           	|	FUNC  	|	0xc
+	|	0x00000160	|	NMI_Handler                 	|	FUNC  	|	0x2
+	|	0x00000162	|	HardFault_Handler           	|	FUNC  	|	0x2
+	|	0x00000164	|	__huansic_systick_update_irq	|	FUNC  	|	0xa6
+	|	0x0000020a	|	huansic_chronos_init        	|	FUNC  	|	0x78
+	|	0x00000282	|	huansic_delay_ms            	|	FUNC  	|	0x4
+	|	0x00000286	|	SysTick_Handler             	|	FUNC  	|	0xe
+	|	0x00000294	|	main                        	|	FUNC  	|	0x10
+	|	0x000002a4	|	SystemInit                  	|	FUNC  	|	0xea
+	|	0x0000038e	|	SystemCoreClockUpdate       	|	FUNC  	|	0xb0
+
+.data
+	|	0x20000000	|	AHBPrescTable               	|	OBJECT	|	0x10
+	|	0x20000010	|	SystemCoreClock             	|	OBJECT	|	0x4
+
+.bss
+	|	0x20000018	|	fp                          	|	OBJECT	|	0x4
+	|	0x2000001c	|	milliseconds                	|	OBJECT	|	0x2
+	|	0x2000001e	|	next                        	|	OBJECT	|	0x1
+	|	0x20000020	|	seconds                     	|	OBJECT	|	0x4
+	|	0x20000024	|	reminders                   	|	OBJECT	|	0x180
+	|	0x200001a4	|	wheel                       	|	OBJECT	|	0x20
+
