@@ -5,9 +5,9 @@
  *      Author: ZonghuanWu
  */
 
-#include "huansic_comm.h"
+#include "huansic_ble.h"
 
-void huansic_subsys_init() {
+void huansic_ble_init() {
 	GPIO_InitTypeDef GPIO_InitStructure = { 0 };
 	USART_InitTypeDef USART_InitStructure = { 0 };
 	NVIC_InitTypeDef NVIC_InitStructure = { 0 };
@@ -15,15 +15,21 @@ void huansic_subsys_init() {
 	IRQn_Type irq;
 
 	// apply changes
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART7, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOE, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART6, ENABLE);
+
+	// set up AT GPIO
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+	GPIO_Init(GPIOE, &GPIO_InitStructure);
 
 	// set up TX and RX GPIO
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
 
@@ -36,14 +42,14 @@ void huansic_subsys_init() {
 	USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
 
 	// apply changes
-	USART_Init(UART7, &USART_InitStructure);
+	USART_Init(UART6, &USART_InitStructure);
 
 	// enable reception interrupt
-	USART_ITConfig(UART7, USART_IT_RXNE, ENABLE);
+	USART_ITConfig(UART6, USART_IT_RXNE, ENABLE);
 
 	// set up NVIC
-	NVIC_InitStructure.NVIC_IRQChannel = UART7_IRQn;
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 3;	// 2nd highest priority
+	NVIC_InitStructure.NVIC_IRQChannel = UART6_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 4;	// 3rd highest priority
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;			// highest sub-priority
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 
@@ -51,20 +57,20 @@ void huansic_subsys_init() {
 	NVIC_Init(&NVIC_InitStructure);
 
 	// start UART
-	USART_Cmd(UART7, ENABLE);
+	USART_Cmd(UART6, ENABLE);
 }
 
-__huansic_subsys_received(uint8_t data){
+__huansic_ble_received(uint8_t data){
 
 }
 
-void UART7_IRQHandler() {
-	if (USART_GetITStatus(UART7, USART_IT_ORE)) {
-		USART_ReceiveData(UART7);
-		USART_ReceiveData(UART7);
-		USART_ClearFlag(UART7, USART_FLAG_ORE);
-	} else if (USART_GetITStatus(UART7, USART_IT_RXNE)) {
-		__huansic_subsys_received(USART_ReceiveData(UART7) & 0x0FF);
-		USART_ClearFlag(UART7, USART_FLAG_RXNE);
+void UART6_IRQHandler() {
+	if (USART_GetITStatus(UART6, USART_IT_ORE)) {
+		USART_ReceiveData(UART6);
+		USART_ReceiveData(UART6);
+		USART_ClearFlag(UART6, USART_FLAG_ORE);
+	} else if (USART_GetITStatus(UART6, USART_IT_RXNE)) {
+		__huansic_ble_received(USART_ReceiveData(UART6) & 0x0FF);
+		USART_ClearFlag(UART6, USART_FLAG_RXNE);
 	}
 }

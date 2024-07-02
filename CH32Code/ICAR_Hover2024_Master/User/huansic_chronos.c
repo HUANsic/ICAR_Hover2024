@@ -22,31 +22,6 @@ uint8_t wheel[REMINDER_LENGTH];		// will be set to 255 if there's no upcoming re
 uint8_t next;
 void (*fp)(uint32_t sec, uint16_t ms);
 
-void __huansic_systick_update_irq(void) {
-	if (milliseconds == 59) {
-		seconds++;
-		milliseconds = 0;
-	} else {
-		milliseconds++;
-	}
-
-	// push the wheel
-	if (wheel[next] < REMINDER_LENGTH) {
-		while (reminders[wheel[next]].scheduled_second >= seconds && reminders[wheel[next]].scheduled_ms >= milliseconds) {
-			fp = reminders[wheel[next]].thread;		// store the function pointer
-			// condition the reminder
-			reminders[wheel[next]].thread = 0;
-			reminders[wheel[next]].scheduled_second = 0;
-			reminders[wheel[next]].scheduled_ms = 0;
-			wheel[next] = 255;
-			next = (next + 1) % REMINDER_LENGTH;
-			// call the thread
-			if (fp) {
-				fp(seconds, milliseconds);}
-		}
-	}
-}
-
 void huansic_chronos_init(void) {
 	uint8_t i;
 	seconds = 0;
@@ -154,6 +129,31 @@ int8_t huansic_chronos_schedule(uint32_t scheduled_second, uint16_t scheduled_ms
 
 	// return index on success
 	return target;
+}
+
+void __huansic_systick_update_irq(void) {
+	if (milliseconds == 59) {
+		seconds++;
+		milliseconds = 0;
+	} else {
+		milliseconds++;
+	}
+
+	// push the wheel
+	if (wheel[next] < REMINDER_LENGTH) {
+		while (reminders[wheel[next]].scheduled_second >= seconds && reminders[wheel[next]].scheduled_ms >= milliseconds) {
+			fp = reminders[wheel[next]].thread;		// store the function pointer
+			// condition the reminder
+			reminders[wheel[next]].thread = 0;
+			reminders[wheel[next]].scheduled_second = 0;
+			reminders[wheel[next]].scheduled_ms = 0;
+			wheel[next] = 255;
+			next = (next + 1) % REMINDER_LENGTH;
+			// call the thread
+			if (fp) {
+				fp(seconds, milliseconds);}
+		}
+	}
 }
 
 void SysTick_Handler() {
