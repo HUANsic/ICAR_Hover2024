@@ -132,7 +132,7 @@ int8_t huansic_chronos_schedule(uint32_t scheduled_second, uint16_t scheduled_ms
 }
 
 void __huansic_systick_update_irq(void) {
-	if (milliseconds == 59) {
+	if (milliseconds == 999) {
 		seconds++;
 		milliseconds = 0;
 	} else {
@@ -157,6 +157,6 @@ void __huansic_systick_update_irq(void) {
 }
 
 void SysTick_Handler() {
-	SysTick->SR = 0;
 	__huansic_systick_update_irq();
+	SysTick->SR = 0;
 }
