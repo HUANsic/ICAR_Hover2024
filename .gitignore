@@ -2,6 +2,7 @@
 .metadata/
 language.settings.xml
 makefile
+obj
 *.prefs
 *.o
 *.elf

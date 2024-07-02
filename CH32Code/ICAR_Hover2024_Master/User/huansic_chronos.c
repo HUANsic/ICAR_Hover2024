@@ -7,30 +7,26 @@
 
 #include "huansic_chronos.h"
 
-uint32_t seconds;
-uint16_t milliseconds;
+volatile uint32_t milliseconds;
 
 struct Reminder {
-	uint32_t scheduled_second;
-	uint16_t scheduled_ms;
-	void (*thread)(uint32_t sec, uint16_t ms);
+	uint32_t scheduled_ms;
+	void (*thread)(uint32_t ms);
 };
 
 #define	REMINDER_LENGTH	32
 struct Reminder reminders[REMINDER_LENGTH];
 uint8_t wheel[REMINDER_LENGTH];		// will be set to 255 if there's no upcoming reminder
 uint8_t next;
-void (*fp)(uint32_t sec, uint16_t ms);
+void (*fp)(uint32_t ms);
 
 void huansic_chronos_init(void) {
 	uint8_t i;
-	seconds = 0;
 	milliseconds = 1;
 	next = 0;
 	for (i = 0; i < REMINDER_LENGTH; i++) {
 		wheel[i] = 255;
 		reminders[i].thread = 0;
-		reminders[i].scheduled_second = 0;
 		reminders[i].scheduled_ms = 0;
 	}
 
@@ -46,9 +42,9 @@ void huansic_chronos_init(void) {
 	NVIC_EnableIRQ(SysTicK_IRQn);
 }
 
-void huansic_delay_ms(uint16_t duration) {
-	uint32_t start = seconds * 60 + milliseconds;
-	while(seconds * 60 + milliseconds - start < duration);
+void huansic_delay_ms(uint32_t duration) {
+	uint32_t start = milliseconds;
+	while(milliseconds - start < duration);
 }
 
 void huansic_delay_us(uint16_t duration) {
@@ -63,17 +59,13 @@ void huansic_delay_us(uint16_t duration) {
 		;
 }
 
-uint32_t huansic_chronos_seconds() {
-	return seconds;
-}
-
 uint32_t huansic_chronos_milliseconds() {
 	return milliseconds;
 }
 
-int8_t huansic_chronos_schedule(uint32_t scheduled_second, uint16_t scheduled_ms, void (*thread)(uint32_t sec, uint16_t ms)) {
+int8_t huansic_chronos_schedule(uint32_t scheduled_ms, void (*thread)(uint32_t ms)) {
 	// if time already elapsed, return -1
-	if (scheduled_second > seconds || (scheduled_second == seconds && scheduled_ms >= milliseconds))
+	if (scheduled_ms >= milliseconds)
 		return -1;
 
 	// find a place to hold the information
@@ -89,7 +81,6 @@ int8_t huansic_chronos_schedule(uint32_t scheduled_second, uint16_t scheduled_ms
 		return -2;
 
 	// add the reminder
-	reminders[target].scheduled_second = scheduled_second;
 	reminders[target].scheduled_ms = scheduled_ms;
 	reminders[target].thread = thread;
 
@@ -102,11 +93,8 @@ int8_t huansic_chronos_schedule(uint32_t scheduled_second, uint16_t scheduled_ms
 		}
 
 		// otherwise find the one to be inserted before
-		if (reminders[wheel[(next + i) % REMINDER_LENGTH]].scheduled_second < scheduled_second)
+		if (reminders[wheel[(next + i) % REMINDER_LENGTH]].scheduled_ms <= scheduled_ms)
 			continue;
-		if (reminders[wheel[(next + i) % REMINDER_LENGTH]].scheduled_second == scheduled_second)
-			if (reminders[wheel[(next + i) % REMINDER_LENGTH]].scheduled_ms <= scheduled_ms)
-				continue;
 		replc = (next + i) % REMINDER_LENGTH;
 	}
 	if (replc == 255)
@@ -132,31 +120,27 @@ int8_t huansic_chronos_schedule(uint32_t scheduled_second, uint16_t scheduled_ms
 }
 
 void __huansic_systick_update_irq(void) {
-	if (milliseconds == 59) {
-		seconds++;
-		milliseconds = 0;
-	} else {
-		milliseconds++;
-	}
+	milliseconds++;
 
 	// push the wheel
 	if (wheel[next] < REMINDER_LENGTH) {
-		while (reminders[wheel[next]].scheduled_second >= seconds && reminders[wheel[next]].scheduled_ms >= milliseconds) {
+		while (reminders[wheel[next]].scheduled_ms >= milliseconds) {
 			fp = reminders[wheel[next]].thread;		// store the function pointer
 			// condition the reminder
 			reminders[wheel[next]].thread = 0;
-			reminders[wheel[next]].scheduled_second = 0;
 			reminders[wheel[next]].scheduled_ms = 0;
 			wheel[next] = 255;
 			next = (next + 1) % REMINDER_LENGTH;
 			// call the thread
 			if (fp) {
-				fp(seconds, milliseconds);}
+				fp(milliseconds);}
 		}
 	}
 }
 
-void SysTick_Handler() {
-	SysTick->SR = 0;
-	__huansic_systick_update_irq();
+__attribute__((interrupt("WCH-Interrupt-fast"))) void SysTick_Handler(void) {
+	if (SysTick->SR) {
+		SysTick->SR = 0;
+		__huansic_systick_update_irq();
+	}
 }

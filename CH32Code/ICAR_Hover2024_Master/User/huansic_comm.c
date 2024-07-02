@@ -11,8 +11,6 @@ void huansic_subsys_init() {
 	GPIO_InitTypeDef GPIO_InitStructure = { 0 };
 	USART_InitTypeDef USART_InitStructure = { 0 };
 	NVIC_InitTypeDef NVIC_InitStructure = { 0 };
-	uint32_t temp32_1 = 0, temp32_2 = 0;
-	IRQn_Type irq;
 
 	// apply changes
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
@@ -54,7 +52,7 @@ void huansic_subsys_init() {
 	USART_Cmd(UART7, ENABLE);
 }
 
-__huansic_subsys_received(uint8_t data){
+void __huansic_subsys_received(uint8_t data){
 
 }
 
