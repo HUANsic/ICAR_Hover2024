@@ -90,3 +90,12 @@ void huansic_led6_set(float bri) {
 void huansic_led7_set(float bri) {
 	GPIO_WriteBit(GPIOE, GPIO_Pin_15, bri < 0.5 ? Bit_RESET : Bit_SET);
 }
+
+void huansic_led2_turn() {
+    if(GPIO_ReadOutputDataBit(GPIOE,GPIO_Pin_10)){
+        GPIO_ResetBits(GPIOE,GPIO_Pin_10);
+    }
+    else{
+        GPIO_SetBits(GPIOE,GPIO_Pin_10);
+    }
+}

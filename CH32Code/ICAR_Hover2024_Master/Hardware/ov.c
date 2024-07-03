@@ -10,6 +10,8 @@
 * microcontroller manufactured by Nanjing Qinheng Microelectronics.
 *******************************************************************************/
 #include "ov.h"
+#include "huansic_util.h"
+#include "huansic_chronos.h"
 
 /* Start Camera list of initialization configuration registers */
 const UINT8 OV2640_InitRegTbl[][2]=
@@ -128,9 +130,9 @@ void SCCB_Start(void)
 {
 	IIC_SDA_SET;
 	IIC_SCL_SET;
-	Delay_Us(50);
+	huansic_delay_us(50);
 	IIC_SDA_CLR;
-	Delay_Us(50);
+	huansic_delay_us(50);
 	IIC_SCL_CLR;
 }
 
@@ -144,11 +146,11 @@ void SCCB_Start(void)
 void SCCB_Stop(void)
 {
 	IIC_SDA_CLR;
-	Delay_Us(50);
+	huansic_delay_us(50);
 	IIC_SCL_SET;
-	Delay_Us(50);
+	huansic_delay_us(50);
 	IIC_SDA_SET;
-	Delay_Us(50);
+	huansic_delay_us(50);
 }
 
 /*********************************************************************
@@ -160,14 +162,14 @@ void SCCB_Stop(void)
  */
 void SCCB_No_Ack(void)
 {
-	Delay_Us(50);
+    huansic_delay_us(50);
 	IIC_SDA_SET;
 	IIC_SCL_SET;
-	Delay_Us(50);
+	huansic_delay_us(50);
 	IIC_SCL_CLR;
-	Delay_Us(50);
+	huansic_delay_us(50);
 	IIC_SDA_CLR;
-	Delay_Us(50);
+	huansic_delay_us(50);
 }
 
 /*********************************************************************
@@ -193,16 +195,16 @@ UINT8 SCCB_WR_Byte(UINT8 data)
 		}
 
 		data <<= 1;
-		Delay_Us(50);
+		huansic_delay_us(50);
 		IIC_SCL_SET;
-		Delay_Us(50);
+		huansic_delay_us(50);
 		IIC_SCL_CLR;
 	}
 
 	IIC_SDA_IN;
-	Delay_Us(50);
+	huansic_delay_us(50);
 	IIC_SCL_SET;
-	Delay_Us(50);
+	huansic_delay_us(50);
 
 	if(SDA_IN_R)t=1;
 	else t=0;
@@ -227,13 +229,13 @@ UINT8 SCCB_RD_Byte(void)
 	IIC_SDA_IN;
 
 	for(i=8; i>0; i--){
-		Delay_Us(50);
+	    huansic_delay_us(50);
 		IIC_SCL_SET;
 		t=t<<1;
 
 		if(SDA_IN_R)t++;
 
-		Delay_Us(50);
+		huansic_delay_us(50);
 		IIC_SCL_CLR;
 	}
 
@@ -259,9 +261,9 @@ UINT8 SCCB_WR_Reg(UINT8 Reg_Adr,UINT8 Reg_Val)
 
 	SCCB_Start();
 	if(SCCB_WR_Byte(SCCB_ID))res=1;
-	Delay_Us(100);
+	huansic_delay_us(100);
   	if(SCCB_WR_Byte(Reg_Adr))res=1;
-  	Delay_Us(100);
+  	huansic_delay_us(100);
   	if(SCCB_WR_Byte(Reg_Val))res=1;
   	SCCB_Stop();
 
@@ -281,15 +283,15 @@ UINT8 SCCB_RD_Reg(UINT8 Reg_Adr)
 
 	SCCB_Start();
 	SCCB_WR_Byte(SCCB_ID);
-	Delay_Us(100);
+	huansic_delay_us(100);
   	SCCB_WR_Byte(Reg_Adr);
-  	Delay_Us(100);
+  	huansic_delay_us(100);
 	SCCB_Stop();
-	Delay_Us(100);
+	huansic_delay_us(100);
 
 	SCCB_Start();
 	SCCB_WR_Byte(SCCB_ID|0X01);
-	Delay_Us(100);
+	huansic_delay_us(100);
   	val=SCCB_RD_Byte();
   	SCCB_No_Ack();
   	SCCB_Stop();
@@ -310,9 +312,9 @@ void DVP_GPIO_Init(void)
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOB|RCC_APB2Periph_GPIOC|RCC_APB2Periph_GPIOD, ENABLE);     //ʹ����ض˿�ʱ��
 
-    //与批次相关的逆天自动重映射配置PB3
-    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DVP | RCC_AHBPeriph_USBHS, ENABLE);     //使能时钟，相当于时钟寄存器对应位置1
-    USBHSD->CONTROL &= ~(1<<2);         //R8_USB_CRTL 寄存器第2位 RB_UC_RST_SIE 置0
+//    //与批次相关的逆天自动重映射配置PB3
+//    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DVP | RCC_AHBPeriph_USBHS, ENABLE);     //使能时钟，相当于时钟寄存器对应位置1
+//    USBHSD->CONTROL &= ~(1<<2);         //R8_USB_CRTL 寄存器第2位 RB_UC_RST_SIE 置0
 
     //PC3-PC13
     GPIO_InitStructure.GPIO_Pin  = GPIO_Pin_3 | GPIO_Pin_13;
@@ -324,7 +326,7 @@ void DVP_GPIO_Init(void)
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin  = GPIO_Pin_3 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11  ;
+    GPIO_InitStructure.GPIO_Pin  = GPIO_Pin_6 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11  ;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
@@ -354,9 +356,9 @@ UINT8 OV2640_Init(void)
 	DVP_GPIO_Init();
 
 	OV_PWDN_CLR;                //POWER ON
- 	Delay_Ms(10);
+ 	huansic_delay_ms(10);
  	OV_RESET_CLR;				//Reset OV2640
-	Delay_Ms(10);
+ 	huansic_delay_ms(10);
 	OV_RESET_SET;				//Reset End
 
 	SCCB_GPIO_Init();
@@ -364,7 +366,7 @@ UINT8 OV2640_Init(void)
 
  	SCCB_WR_Reg(0x12, 0x80);	//Reset All Register
 
- 	Delay_Ms(50);
+ 	huansic_delay_ms(50);
 
 	//Read MID
 	reg=SCCB_RD_Reg(0x1C);

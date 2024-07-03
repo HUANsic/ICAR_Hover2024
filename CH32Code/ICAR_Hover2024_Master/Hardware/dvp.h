@@ -3,7 +3,6 @@
 
 #include <ov.h>
 #include "ch32v30x.h"
-#include "uart5.h"
 
 void DVP_Init(void);
 u8 GetGray_RGB565(u8 href, u8 row);

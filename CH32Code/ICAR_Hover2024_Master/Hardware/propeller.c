@@ -62,9 +62,10 @@ void Propeller_Enable(void){
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD, ENABLE);//使能GPIO端口时钟
     GPIO_InitTypeDef  GPIO_InitStructure;                //定义一个GPIO_InitTypeDef类型的结构体
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11; //配置GPIO引脚
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;     //设置GPIO模式为推挽输出
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;     //设置GPIO模式为推挽输出
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;    //设置GPIO口输出速度
     GPIO_Init(GPIOD, &GPIO_InitStructure);               //调用库函数，初始化GPIOD
-    GPIO_WriteBit(GPIOD, GPIO_Pin_11, Bit_SET);
+    //GPIO_WriteBit(GPIOD, GPIO_Pin_11, Bit_SET);
+    GPIO_SetBits(GPIOD, GPIO_Pin_11);
 };
 

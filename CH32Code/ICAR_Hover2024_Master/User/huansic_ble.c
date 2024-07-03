@@ -11,8 +11,6 @@ void huansic_ble_init() {
 	GPIO_InitTypeDef GPIO_InitStructure = { 0 };
 	USART_InitTypeDef USART_InitStructure = { 0 };
 	NVIC_InitTypeDef NVIC_InitStructure = { 0 };
-	uint32_t temp32_1 = 0, temp32_2 = 0;
-	IRQn_Type irq;
 
 	// apply changes
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOE, ENABLE);
@@ -44,8 +42,8 @@ void huansic_ble_init() {
 	// apply changes
 	USART_Init(UART6, &USART_InitStructure);
 
-	// enable reception interrupt
-	USART_ITConfig(UART6, USART_IT_RXNE, ENABLE);
+	// enable overrun error and reception and TX empty interrupt
+	USART_ITConfig(UART6, USART_IT_ORE | USART_IT_RXNE | USART_IT_TXE, ENABLE);
 
 	// set up NVIC
 	NVIC_InitStructure.NVIC_IRQChannel = UART6_IRQn;
@@ -64,11 +62,20 @@ void huansic_ble_AT(uint8_t enter) {
 	GPIO_WriteBit(GPIOE, GPIO_Pin_13, enter ? Bit_RESET : Bit_SET);		// LOW for AT mode
 }
 
-__huansic_ble_received(uint8_t data) {
+void huansic_ble_send(uint8_t *str, uint8_t len){
 
 }
 
+void __huansic_ble_received(uint8_t data) {
+
+}
+
+uint8_t __huansic_ble_sent(){
+	return 0;	// todo
+}
+
 void UART6_IRQHandler() {
+
 	if (USART_GetITStatus(UART6, USART_IT_ORE)) {
 		USART_ReceiveData(UART6);
 		USART_ReceiveData(UART6);
@@ -76,5 +83,7 @@ void UART6_IRQHandler() {
 	} else if (USART_GetITStatus(UART6, USART_IT_RXNE)) {
 		__huansic_ble_received(USART_ReceiveData(UART6) & 0x0FF);
 		USART_ClearFlag(UART6, USART_FLAG_RXNE);
+	} else if (USART_GetITStatus(UART6, USART_IT_TXE)){
+		USART_ClearFlag(UART6, USART_FLAG_TXE);
 	}
 }

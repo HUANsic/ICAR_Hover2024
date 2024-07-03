@@ -1,28 +1,32 @@
-#include "uart5.h"
+#include <usart2.h>
 
-u8 Serial_RxData;       //串口接收数据
-u8 Serial_RxFlag;       //串口接收标志位
+u8 USART2_RxData;       //串口接收数据
+u8 USART2_RxFlag;       //串口接收标志位
 
-void UART5_Init(uint32_t baudrate){
+u8 UART6_RxData;       //串口接收数据
+u8 UART6_RxFlag;       //串口接收标志位
+
+u8 UART7_RxData;       //串口接收数据
+u8 UART7_RxFlag;       //串口接收标志位
+
+void USART2_Init(uint32_t baudrate){
     GPIO_InitTypeDef  GPIO_InitStructure;
     USART_InitTypeDef USART_InitStructure;
     NVIC_InitTypeDef  NVIC_InitStructure = {0};
 
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_UART5, ENABLE);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO,ENABLE);
 
-    GPIO_PinRemapConfig(GPIO_PartialRemap_USART5,ENABLE);
-
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-    GPIO_Init(GPIOB, &GPIO_InitStructure);
+    GPIO_Init(GPIOA, &GPIO_InitStructure);
 
     USART_InitStructure.USART_BaudRate = baudrate;
     USART_InitStructure.USART_WordLength = USART_WordLength_8b;
@@ -30,27 +34,27 @@ void UART5_Init(uint32_t baudrate){
     USART_InitStructure.USART_Parity = USART_Parity_No;
     USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
     USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
-    USART_Init(UART5, &USART_InitStructure);
+    USART_Init(USART2, &USART_InitStructure);
 
-    USART_ITConfig(UART5, USART_IT_RXNE, ENABLE);
+    USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
 
-    NVIC_InitStructure.NVIC_IRQChannel = UART5_IRQn;
+    NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
     NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
     NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
     NVIC_Init(&NVIC_InitStructure);
 
-    USART_Cmd(UART5, ENABLE);
+    USART_Cmd(USART2, ENABLE);
 }
 
-void UART5_IRQHandler(void)__attribute__((interrupt("WCH-Interrupt-fast")));
-void UART5_IRQHandler(void)
+void USART2_IRQHandler(void)__attribute__((interrupt("WCH-Interrupt-fast")));
+void USART2_IRQHandler(void)
 {
-    if (USART_GetITStatus(UART5, USART_IT_RXNE) == SET)        //判断是否是UART5的接收事件触发的中断
+    if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET)        //判断是否是UART5的接收事件触发的中断
     {
-        Serial_RxData = USART_ReceiveData(UART5);
-        Serial_RxFlag = 1;
-        USART_ClearITPendingBit(UART5, USART_IT_RXNE);         //清除标志位
+        USART2_RxData = USART_ReceiveData(USART2);
+        USART2_RxFlag = 1;
+        USART_ClearITPendingBit(USART2, USART_IT_RXNE);         //清除标志位
     }
 }
 
@@ -59,18 +63,18 @@ void UART5_IRQHandler(void)
   * 参    数：无
   * 返 回 值：串口接收数据包标志位，范围：0~1，接收到数据包后，标志位置1，读取后标志位自动清零
   */
-uint8_t Serial_GetRxFlag(void)
+uint8_t USART2_GetRxFlag(void)
 {
-    if (Serial_RxFlag == 1)         //如果标志位为1
+    if (USART2_RxFlag == 1)         //如果标志位为1
     {
-        Serial_RxFlag = 0;
+        USART2_RxFlag = 0;
         return 1;                   //则返回1，并自动清零标志位
     }
     return 0;                       //如果标志位为0，则返回0
 }
 
-uint8_t Serial_GetRxData(void){
-    return Serial_RxData;
+uint8_t USART2_GetRxData(void){
+    return USART2_RxData;
 }
 
 
@@ -81,8 +85,8 @@ uint8_t Serial_GetRxData(void){
   */
 void Serial_SendByte(uint8_t Byte)
 {
-    USART_SendData(UART5, Byte);       //将字节数据写入数据寄存器，写入后USART自动生成时序波形
-    while (USART_GetFlagStatus(UART5, USART_FLAG_TXE) == RESET);   //等待发送完成
+    USART_SendData(USART2, Byte);       //将字节数据写入数据寄存器，写入后USART自动生成时序波形
+    while (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);   //等待发送完成
     /*下次写入数据寄存器会自动清除发送完成标志位，故此循环后，无需清除标志位*/
 }
 
