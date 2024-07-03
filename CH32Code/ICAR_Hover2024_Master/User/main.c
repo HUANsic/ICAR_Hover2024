@@ -11,7 +11,6 @@
 #include "huansic_util.h"
 #include "huansic_comm.h"
 #include "huansic_motor.h"
-#include "propeller.h"
 #include "dvp.h"
 #include "ov.h"
 #include "usart2.h"
