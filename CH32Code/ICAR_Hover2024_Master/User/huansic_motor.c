@@ -12,14 +12,16 @@ void huansic_motor_init(void) {
 	TIM_OCInitTypeDef TIM_OCInitStructure = { 0 };
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure = { 0 };
 
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_TIM8, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO | RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_TIM8, ENABLE);
 
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7 | GPIO_Pin_6;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOC, &GPIO_InitStructure);
+	AFIO->PCFR1 |= AFIO_PCFR1_TIM4_REMAP;		// remap required!!!
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15 | GPIO_Pin_14 | GPIO_Pin_13 | GPIO_Pin_12;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	GPIO_Init(GPIOD, &GPIO_InitStructure);
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;		// PD11
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
@@ -57,41 +59,41 @@ void huansic_motor_init(void) {
 	TIM_Cmd(TIM8, ENABLE);
 }
 
-void huansic_motor_set(MotorName motor, float val){
+void huansic_motor_set(MotorName motor, float val) {
 	val = val > 1 ? 1 : (val < -1 ? -1 : val);		// constrain
-	if(motor & Fan){
-		if(val < 0){
+	if (motor & Fan) {
+		if (val < 0) {
 			TIM8->CH1CVR = 0;
-			TIM8->CH2CVR = (uint16_t)(-val * 3840);
+			TIM8->CH2CVR = (uint16_t) (-val * 3840);
 		} else {
-			TIM8->CH1CVR = (uint16_t)(val * 3840);
+			TIM8->CH1CVR = (uint16_t) (val * 3840);
 			TIM8->CH2CVR = 0;
 		}
 	}
-	if(motor & LeftProp){
-		if(val < 0){
+	if (motor & LeftProp) {
+		if (val < 0) {
 			TIM4->CH1CVR = 0;
-			TIM4->CH2CVR = (uint16_t)(-val * 3840);
+			TIM4->CH2CVR = (uint16_t) (-val * 3840);
 		} else {
-			TIM4->CH1CVR = (uint16_t)(val * 3840);
+			TIM4->CH1CVR = (uint16_t) (val * 3840);
 			TIM4->CH2CVR = 0;
 		}
 	}
-	if(motor & RightProp){
-		if(val < 0){
+	if (motor & RightProp) {
+		if (val < 0) {
 			TIM4->CH3CVR = 0;
-			TIM4->CH4CVR = (uint16_t)(-val * 3840);
+			TIM4->CH4CVR = (uint16_t) (-val * 3840);
 		} else {
-			TIM4->CH3CVR = (uint16_t)(val * 3840);
+			TIM4->CH3CVR = (uint16_t) (val * 3840);
 			TIM4->CH4CVR = 0;
 		}
 	}
 }
 
-inline void huansic_motor_enable(void){
+inline void huansic_motor_enable(void) {
 	GPIO_WriteBit(GPIOD, GPIO_Pin_11, 1);
 }
 
-inline void huansic_motor_disable(void){
+inline void huansic_motor_disable(void) {
 	GPIO_WriteBit(GPIOD, GPIO_Pin_11, 0);
 }

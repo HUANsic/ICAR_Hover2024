@@ -17,4 +17,12 @@ typedef enum {
 	RightProp = 4
 } MotorName;
 
+void huansic_motor_init(void);
+
+void huansic_motor_set(MotorName motor, float val);
+
+void huansic_motor_enable(void);
+
+void huansic_motor_disable(void);
+
 #endif /* USER_HUANSIC_MOTOR_H_ */

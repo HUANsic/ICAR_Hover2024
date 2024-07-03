@@ -9,6 +9,7 @@
 
 #include "huansic_chronos.h"
 #include "huansic_util.h"
+#include "huansic_motor.h"
 
 void blinkLater(uint32_t ms);
 
@@ -19,8 +20,9 @@ int main(void) {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
 	huansic_led_init();
 	huansic_chronos_init();
-	huansic_chronos_schedule(huansic_chronos_milliseconds() + 500, blinkLater);
-
+	huansic_motor_init();
+	huansic_chronos_schedule(huansic_chronos_milliseconds() + 2000, blinkLater);
+	huansic_motor_enable();
 	while(1) {
 //		huansic_led2_set(0);
 //		huansic_delay_ms(500);
@@ -30,7 +32,8 @@ int main(void) {
 }
 
 void blinkLater(uint32_t ms) {
-	huansic_chronos_schedule(huansic_chronos_milliseconds() + 500, blinkLater);
+	huansic_chronos_schedule(huansic_chronos_milliseconds() + 2000, blinkLater);
 	huansic_led2_set(state);
+	huansic_motor_set(Fan | RightProp | LeftProp, state ? 0.1 : 0.3);
 	state = !state;
 }
