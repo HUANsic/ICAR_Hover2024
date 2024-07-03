@@ -65,7 +65,7 @@ uint32_t huansic_chronos_milliseconds() {
 
 int8_t huansic_chronos_schedule(uint32_t scheduled_ms, void (*thread)(uint32_t ms)) {
 	// if time already elapsed, return -1
-	if (scheduled_ms >= milliseconds)
+	if (scheduled_ms <= milliseconds)
 		return -1;
 
 	// find a place to hold the information
@@ -123,7 +123,7 @@ void __huansic_systick_update_irq(void) {
 	milliseconds++;
 	// push the wheel
 	if (wheel[next] < REMINDER_LENGTH) {
-		while (reminders[wheel[next]].scheduled_ms >= milliseconds) {
+		while (reminders[wheel[next]].scheduled_ms <= milliseconds) {
 			fp = reminders[wheel[next]].thread;		// store the function pointer
 			// condition the reminder
 			reminders[wheel[next]].thread = 0;

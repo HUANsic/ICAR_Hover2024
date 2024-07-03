@@ -10,4 +10,6 @@
 
 #include "ch32v30x.h"
 
+void huansic_subsys_init();
+
 #endif /* USER_HUANSIC_COMM_H_ */

@@ -68,27 +68,27 @@ void huansic_led1_set(float bri) {
 }
 
 void huansic_led2_set(float bri) {
-	GPIO_WriteBit(GPIOE, GPIO_Pin_10, bri < 0.5 ? Bit_RESET : Bit_SET);
+	GPIO_WriteBit(GPIOE, GPIO_Pin_10, bri < 0.5 ? 0 : 1);
 }
 
 void huansic_led3_set(float bri) {
-	GPIO_WriteBit(GPIOE, GPIO_Pin_11, bri < 0.5 ? Bit_RESET : Bit_SET);
+	GPIO_WriteBit(GPIOE, GPIO_Pin_11, bri < 0.5 ? 0 : 1);
 }
 
 void huansic_led4_set(float bri) {
-	GPIO_WriteBit(GPIOE, GPIO_Pin_12, bri < 0.5 ? Bit_RESET : Bit_SET);
+	GPIO_WriteBit(GPIOE, GPIO_Pin_12, bri < 0.5 ? 0 : 1);
 }
 
 void huansic_led5_set(float bri) {
-	GPIO_WriteBit(GPIOE, GPIO_Pin_13, bri < 0.5 ? Bit_RESET : Bit_SET);
+	GPIO_WriteBit(GPIOE, GPIO_Pin_13, bri < 0.5 ? 0 : 1);
 }
 
 void huansic_led6_set(float bri) {
-	GPIO_WriteBit(GPIOE, GPIO_Pin_14, bri < 0.5 ? Bit_RESET : Bit_SET);
+	GPIO_WriteBit(GPIOE, GPIO_Pin_14, bri < 0.5 ? 0 : 1);
 }
 
 void huansic_led7_set(float bri) {
-	GPIO_WriteBit(GPIOE, GPIO_Pin_15, bri < 0.5 ? Bit_RESET : Bit_SET);
+	GPIO_WriteBit(GPIOE, GPIO_Pin_15, bri < 0.5 ? 0 : 1);
 }
 
 void huansic_led2_turn() {

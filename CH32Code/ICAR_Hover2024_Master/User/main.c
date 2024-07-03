@@ -9,11 +9,14 @@
 
 #include "huansic_chronos.h"
 #include "huansic_util.h"
+#include "huansic_comm.h"
+#include "huansic_motor.h"
 #include "propeller.h"
 #include "dvp.h"
 #include "ov.h"
 #include "usart2.h"
 
+uint8_t state;
 
 int main(void) {
 	SystemCoreClockUpdate();
@@ -50,4 +53,11 @@ int main(void) {
             printf("%d\n", USART2_GetRxData());
         }
 	}
+}
+
+void blinkLater(uint32_t ms) {
+	huansic_chronos_schedule(huansic_chronos_milliseconds() + 2000, blinkLater);
+	huansic_led2_set(state);
+	huansic_motor_set(Fan | RightProp | LeftProp, state ? 0.1 : 0.3);
+	state = !state;
 }
