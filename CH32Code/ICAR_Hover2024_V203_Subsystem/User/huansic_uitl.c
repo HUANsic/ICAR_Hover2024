@@ -68,3 +68,11 @@ void huansic_led2_set(float bri) {
 		bri = 1;
 	TIM1->CH2CVR = (uint16_t) (bri * 1000);
 }
+
+void huansic_led1_turn() {
+    TIM1->CH1CVR = (uint16_t) (TIM1->CH1CVR > 500 ? 0 : 1000);
+}
+
+void huansic_led2_turn() {
+    TIM1->CH2CVR = (uint16_t) (TIM1->CH2CVR > 500 ? 0 : 1000);
+}
