@@ -6,13 +6,6 @@
  */
 
 #include "huansic_comm.h"
-#include "huansic_util.h"
-
-uint8_t subsys_data;
-uint8_t subsys_data_flag;
-opt_data_typedef opt_data;
-uint8_t opt_data_flag = 0;
-uint8_t serial_status_flag = 0;
 
 void huansic_subsys_init() {
 	GPIO_InitTypeDef GPIO_InitStructure = { 0 };
@@ -60,98 +53,16 @@ void huansic_subsys_init() {
 }
 
 void __huansic_subsys_received(uint8_t data){
-    subsys_data = data;
-    subsys_data_flag = 1;
-    huansic_led7_turn();
+    printf("%d\n", data);
 }
 
-//void UART7_IRQHandler(void)__attribute__((interrupt("WCH-Interrupt-fast")));
-//void UART7_IRQHandler() {
-//	if (USART_GetITStatus(UART7, USART_IT_ORE)) {
-//		USART_ReceiveData(UART7);
-//		USART_ReceiveData(UART7);
-//		USART_ClearFlag(UART7, USART_FLAG_ORE);
-//	} else if (USART_GetITStatus(UART7, USART_IT_RXNE)) {
-//		__huansic_subsys_received(USART_ReceiveData(UART7) & 0x0FF);
-//		USART_ClearFlag(UART7, USART_FLAG_RXNE);
-//	}
-//}
-
-void UART7_IRQHandler(void)__attribute__((interrupt("WCH-Interrupt-fast")));
-void UART7_IRQHandler(void) {
-    if (USART_GetITStatus(UART7, USART_IT_RXNE) == SET)        //判断是否是UART5的接收事件触发的中断
-    {
-        int8_t subsys_data_temp = USART_ReceiveData(UART7);
-        subsys_data_flag = 1;
-        if(serial_status_flag == 0 && subsys_data_temp == (int8_t)0x01) {
-            serial_status_flag++;
-        }
-        else if(serial_status_flag == 1) {
-            opt_data.front_dx = subsys_data_temp;
-            serial_status_flag++;
-        }
-        else if(serial_status_flag == 2) {
-            opt_data.front_dy = subsys_data_temp;
-            serial_status_flag++;
-        }
-        else if(serial_status_flag == 3) {
-            opt_data.rear_dx = subsys_data_temp;
-            serial_status_flag++;
-        }
-        else if(serial_status_flag == 4) {
-            opt_data.rear_dy = subsys_data_temp;
-            serial_status_flag++;
-        }
-        else if(serial_status_flag == 5 && subsys_data_temp == (int8_t)0x8f) {
-            serial_status_flag = 0;
-            opt_data_flag = 1;
-        }
-
-        else if(serial_status_flag == 0 && subsys_data_temp == (int8_t)0x00) {
-            serial_status_flag = 6;
-        }
-        else if(serial_status_flag == 6) {
-            subsys_data = (uint8_t)subsys_data_temp;
-            serial_status_flag++;
-        }
-        else if(serial_status_flag == 7 && subsys_data_temp == (int8_t)0xff) {
-            serial_status_flag = 0;
-            subsys_data_flag = 1;
-        }
-        else {
-            serial_status_flag = 0;
-            printf("subsystem serial data receive logic error\n");
-        }
-        huansic_led7_turn();
-        USART_ClearITPendingBit(UART7, USART_IT_RXNE);         //清除标志位
-    }
-}
-
-uint8_t get_opt_data_flag() {
-    return opt_data_flag;
-}
-
-opt_data_typedef get_opt_data() {
-    opt_data_flag = 0;
-    return opt_data;
-}
-
-uint8_t get_subsys_data_flag(void)
-{
-    if (subsys_data_flag == 1)         //如果标志位为1
-    {
-        subsys_data_flag = 0;
-        return 1;                   //则返回1，并自动清零标志位
-    }
-    return 0;                       //如果标志位为0，则返回0
-}
-
-uint8_t get_subsys_data(void){
-    return subsys_data;
-}
-
-void UART7_SendByte(uint8_t Byte) {
-    USART_SendData(UART7, Byte);       //将字节数据写入数据寄存器，写入后USART自动生成时序波形
-    while (USART_GetFlagStatus(UART7, USART_FLAG_TXE) == RESET);   //等待发送完成
-    /*下次写入数据寄存器会自动清除发送完成标志位，故此循环后，无需清除标志位*/
+void UART7_IRQHandler() {
+	if (USART_GetITStatus(UART7, USART_IT_ORE)) {
+		USART_ReceiveData(UART7);
+		USART_ReceiveData(UART7);
+		USART_ClearFlag(UART7, USART_FLAG_ORE);
+	} else if (USART_GetITStatus(UART7, USART_IT_RXNE)) {
+		__huansic_subsys_received(USART_ReceiveData(UART7) & 0x0FF);
+		USART_ClearFlag(UART7, USART_FLAG_RXNE);
+	}
 }

@@ -28,18 +28,6 @@ void huansic_led6_set(float bri);
 
 void huansic_led7_set(float bri);
 
-void huansic_led1_turn(void);
-
 void huansic_led2_turn(void);
-
-void huansic_led3_turn(void);
-
-void huansic_led4_turn(void);
-
-void huansic_led5_turn(void);
-
-void huansic_led6_turn(void);
-
-void huansic_led7_turn(void);
 
 #endif /* USER_HUANSIC_UTIL_H_ */

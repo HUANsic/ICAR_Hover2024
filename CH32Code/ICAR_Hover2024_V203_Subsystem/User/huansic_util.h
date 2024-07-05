@@ -24,8 +24,4 @@ void huansic_led1_set(float bri);
 
 void huansic_led2_set(float bri);
 
-void huansic_led1_turn();
-
-void huansic_led2_turn();
-
 #endif /* USER_HUANSIC_UTIL_H_ */

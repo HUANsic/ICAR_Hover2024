@@ -91,32 +91,11 @@ void huansic_led7_set(float bri) {
 	GPIO_WriteBit(GPIOE, GPIO_Pin_15, bri < 0.5 ? 0 : 1);
 }
 
-void huansic_led1_turn() {
-    TIM3->CH3CVR = (uint16_t) (TIM3->CH3CVR > 500 ? 0 : 1000);
-}
-
 void huansic_led2_turn() {
-    GPIO_WriteBit(GPIOE, GPIO_Pin_10, GPIO_ReadOutputDataBit(GPIOE,GPIO_Pin_10) ? 0 : 1);
+    if(GPIO_ReadOutputDataBit(GPIOE,GPIO_Pin_10)){
+        GPIO_ResetBits(GPIOE,GPIO_Pin_10);
+    }
+    else{
+        GPIO_SetBits(GPIOE,GPIO_Pin_10);
+    }
 }
-
-void huansic_led3_turn() {
-    GPIO_WriteBit(GPIOE, GPIO_Pin_11, GPIO_ReadOutputDataBit(GPIOE,GPIO_Pin_11) ? 0 : 1);
-}
-
-void huansic_led4_turn() {
-    GPIO_WriteBit(GPIOE, GPIO_Pin_12, GPIO_ReadOutputDataBit(GPIOE,GPIO_Pin_12) ? 0 : 1);
-}
-
-void huansic_led5_turn() {
-    GPIO_WriteBit(GPIOE, GPIO_Pin_13, GPIO_ReadOutputDataBit(GPIOE,GPIO_Pin_13) ? 0 : 1);
-}
-
-void huansic_led6_turn() {
-    GPIO_WriteBit(GPIOE, GPIO_Pin_14, GPIO_ReadOutputDataBit(GPIOE,GPIO_Pin_14) ? 0 : 1);
-}
-
-void huansic_led7_turn() {
-    GPIO_WriteBit(GPIOE, GPIO_Pin_15, GPIO_ReadOutputDataBit(GPIOE,GPIO_Pin_15) ? 0 : 1);
-}
-
-

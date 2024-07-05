@@ -20,6 +20,7 @@ uint8_t state;
 int main(void) {
 	SystemCoreClockUpdate();
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+    //USART_Printf_Init(115200);
     USART2_Init(115200);
     printf("SystemClk:%d\r\n",SystemCoreClock);
     printf("ChipID:%08x\r\n", DBGMCU_GetCHIPID());
@@ -29,7 +30,9 @@ int main(void) {
     huansic_led_init();
 	huansic_chronos_init();
 
-	huansic_led1_turn();
+	huansic_led2_turn();
+    huansic_delay_ms(500);
+    huansic_led2_turn();
     huansic_delay_ms(500);
 
 //    while(OV2640_Init()){
@@ -41,19 +44,13 @@ int main(void) {
 //    DVP_Init();
 
 	while(1) {
-	    huansic_led1_turn();
-		huansic_led2_turn();
+		huansic_led2_set(1);
+		huansic_delay_ms(500);
+		huansic_led2_set(0);
 		huansic_delay_ms(500);
 		if(USART2_GetRxFlag() == 1){
             printf("%d\n", USART2_GetRxData());
         }
-		if(get_subsys_data_flag() == 1){
-		    printf("byte data: %d\n", get_subsys_data());
-        }
-		while(! get_opt_data_flag());
-        printf("opt data: %d, %d, %d, %d\n", get_opt_data().front_dx, get_opt_data().front_dy, get_opt_data().rear_dx, get_opt_data().rear_dy);
-
-		UART7_SendByte(0x11);
 	}
 }
 

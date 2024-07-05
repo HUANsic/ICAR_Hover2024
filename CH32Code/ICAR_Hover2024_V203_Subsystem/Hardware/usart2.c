@@ -1,5 +1,4 @@
 #include <usart2.h>
-#include "huansic_util.h"
 
 u8 USART2_RxData;       //串口接收数据
 u8 USART2_RxFlag;       //串口接收标志位
@@ -55,7 +54,6 @@ void USART2_IRQHandler(void)
     {
         USART2_RxData = USART_ReceiveData(USART2);
         USART2_RxFlag = 1;
-        huansic_led2_turn();
         USART_ClearITPendingBit(USART2, USART_IT_RXNE);         //清除标志位
     }
 }
@@ -90,21 +88,6 @@ void Serial_SendByte(uint8_t Byte)
     USART_SendData(USART2, Byte);       //将字节数据写入数据寄存器，写入后USART自动生成时序波形
     while (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);   //等待发送完成
     /*下次写入数据寄存器会自动清除发送完成标志位，故此循环后，无需清除标志位*/
-}
-
-void Serial_SendByteData(uint8_t Byte) {
-    Serial_SendByte(0x00);
-    Serial_SendByte(Byte);
-    Serial_SendByte(0xff);
-}
-
-void Serial_SendSensorData(opt_data_typedef opt_data) {
-    Serial_SendByte(0x01);
-    Serial_SendByte(opt_data.front_dx);
-    Serial_SendByte(opt_data.front_dy);
-    Serial_SendByte(opt_data.rear_dx);
-    Serial_SendByte(opt_data.rear_dy);
-    Serial_SendByte(0x8f);
 }
 
 
