@@ -87,40 +87,56 @@ void UART7_IRQHandler(void) {
             serial_status_flag++;
         }
         else if(serial_status_flag == 1) {
-            opt_data.front_dx = subsys_data_temp;
+            opt_data.front_dx = (int8_t)(subsys_data_temp << 8);
             serial_status_flag++;
         }
         else if(serial_status_flag == 2) {
-            opt_data.front_dy = subsys_data_temp;
+            opt_data.front_dx = (int8_t)(subsys_data_temp);
             serial_status_flag++;
         }
         else if(serial_status_flag == 3) {
-            opt_data.rear_dx = subsys_data_temp;
+            opt_data.front_dy = (int8_t)(subsys_data_temp << 8);
             serial_status_flag++;
         }
         else if(serial_status_flag == 4) {
-            opt_data.rear_dy = subsys_data_temp;
+            opt_data.front_dy = (int8_t)(subsys_data_temp);
             serial_status_flag++;
         }
-        else if(serial_status_flag == 5 && subsys_data_temp == (int8_t)0x8f) {
+        else if(serial_status_flag == 5) {
+            opt_data.rear_dx = (int8_t)(subsys_data_temp << 8);
+            serial_status_flag++;
+        }
+        else if(serial_status_flag == 6) {
+            opt_data.rear_dx = (int8_t)(subsys_data_temp);
+            serial_status_flag++;
+        }
+        else if(serial_status_flag == 7) {
+            opt_data.rear_dy = (int8_t)(subsys_data_temp << 8);
+            serial_status_flag++;
+        }
+        else if(serial_status_flag == 8) {
+            opt_data.rear_dy = (int8_t)(subsys_data_temp);
+            serial_status_flag++;
+        }
+        else if(serial_status_flag == 9 && subsys_data_temp == (int8_t)0x8f) {
             serial_status_flag = 0;
             opt_data_flag = 1;
         }
 
         else if(serial_status_flag == 0 && subsys_data_temp == (int8_t)0x00) {
-            serial_status_flag = 6;
+            serial_status_flag = 16;
         }
-        else if(serial_status_flag == 6) {
+        else if(serial_status_flag == 16) {
             subsys_data = (uint8_t)subsys_data_temp;
             serial_status_flag++;
         }
-        else if(serial_status_flag == 7 && subsys_data_temp == (int8_t)0xff) {
+        else if(serial_status_flag == 17 && subsys_data_temp == (int8_t)0xff) {
             serial_status_flag = 0;
             subsys_data_flag = 1;
         }
         else {
             serial_status_flag = 0;
-            printf("subsystem serial data receive logic error\n");
+//            printf("subsystem serial data receive logic error\n");
         }
         huansic_led7_turn();
         USART_ClearITPendingBit(UART7, USART_IT_RXNE);         //清除标志位

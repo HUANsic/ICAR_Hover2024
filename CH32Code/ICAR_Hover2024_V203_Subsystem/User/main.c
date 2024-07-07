@@ -20,9 +20,13 @@ int main(void) {
     huansic_led_init();
     opt_init();
 	while(1) {
-		Delay_Ms(2000);
-		huansic_led1_turn();
-        Serial_SendSensorData(get_opt_data());
-        Serial_SendByteData(62);
+//		Delay_Ms(2000);
+//		huansic_led1_turn();
+		refresh_opt_data();
+        Serial_SendByteData(get_opt_data().front_interval / 10);
+        if(USART2_GetRxFlag()){
+            Serial_SendSensorData(get_opt_data());
+            reset_opt_data();
+        }
 	}
 }

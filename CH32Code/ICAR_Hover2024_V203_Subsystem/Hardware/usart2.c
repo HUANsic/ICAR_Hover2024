@@ -54,8 +54,10 @@ void USART2_IRQHandler(void)
     if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET)        //判断是否是UART5的接收事件触发的中断
     {
         USART2_RxData = USART_ReceiveData(USART2);
-        USART2_RxFlag = 1;
-        huansic_led2_turn();
+        if(USART2_RxData == 0x11){
+            USART2_RxFlag = 1;
+            huansic_led2_turn();
+        }
         USART_ClearITPendingBit(USART2, USART_IT_RXNE);         //清除标志位
     }
 }
@@ -100,10 +102,14 @@ void Serial_SendByteData(uint8_t Byte) {
 
 void Serial_SendSensorData(opt_data_typedef opt_data) {
     Serial_SendByte(0x01);
-    Serial_SendByte(opt_data.front_dx);
-    Serial_SendByte(opt_data.front_dy);
-    Serial_SendByte(opt_data.rear_dx);
-    Serial_SendByte(opt_data.rear_dy);
+    Serial_SendByte((uint16_t)opt_data.front_dx >> 8);
+    Serial_SendByte((uint16_t)opt_data.front_dx);
+    Serial_SendByte((uint16_t)opt_data.front_dy >> 8);
+    Serial_SendByte((uint16_t)opt_data.front_dy);
+    Serial_SendByte((uint16_t)opt_data.rear_dx >> 8);
+    Serial_SendByte((uint16_t)opt_data.rear_dx);
+    Serial_SendByte((uint16_t)opt_data.rear_dy >> 8);
+    Serial_SendByte((uint16_t)opt_data.rear_dy);
     Serial_SendByte(0x8f);
 }
 

@@ -11,10 +11,12 @@
 #include "ch32v30x.h"
 
 typedef struct {
-    int8_t front_dx;
-    int8_t front_dy;
-    int8_t rear_dx;
-    int8_t rear_dy;
+    int16_t front_dx;
+    int16_t front_dy;
+    int16_t rear_dx;
+    int16_t rear_dy;
+    uint32_t front_interval;
+    uint32_t rear_interval;
 } opt_data_typedef;
 
 void huansic_subsys_init();
