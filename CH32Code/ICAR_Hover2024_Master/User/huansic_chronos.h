@@ -14,7 +14,7 @@ void huansic_chronos_init(void);
 
 void huansic_delay_ms(uint32_t duration);
 
-void huansic_delay_us(uint16_t duration);
+void huansic_delay_us(uint32_t duration);
 
 uint32_t huansic_chronos_milliseconds(void);
 

@@ -46,10 +46,15 @@ int main(void) {
     printf("RGB565_MODE\r\n");
     DVP_Init();
 
+    uint32_t i = 0;
+
 	while(1) {
 	    huansic_led1_turn();
 		huansic_led2_turn();
+		printf("running, i = %d\n", i);
+		i++;
 		huansic_delay_ms(500);
+
 //		if(USART2_GetRxFlag() == 1){
 //            printf("%d\n", USART2_GetRxData());
 //        }
