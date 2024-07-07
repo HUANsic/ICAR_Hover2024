@@ -16,4 +16,6 @@ obj
 *.xmi
 *.xml
 *.snap
+*.hex
+*.lst
 ~*
