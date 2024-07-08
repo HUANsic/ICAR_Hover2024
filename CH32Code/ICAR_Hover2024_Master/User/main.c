@@ -14,6 +14,7 @@
 #include "dvp.h"
 #include "ov.h"
 #include "usart2.h"
+#include "mco.h"
 
 uint8_t state;
 
@@ -28,10 +29,10 @@ int main(void) {
     huansic_led_init();
 	huansic_chronos_init();
 	huansic_motor_init();
+	mco_init();
 
 	huansic_led1_turn();
     huansic_delay_ms(500);
-
 
     huansic_motor_enable();
     huansic_motor_set(Fan, 0.2);
