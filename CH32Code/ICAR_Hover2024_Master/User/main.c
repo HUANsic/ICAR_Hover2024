@@ -35,9 +35,9 @@ int main(void) {
     huansic_delay_ms(500);
 
     huansic_motor_enable();
-    huansic_motor_set(Fan, 0.2);
-    huansic_motor_set(LeftProp, 1);
-    huansic_motor_set(RightProp, 1);
+    huansic_motor_set(Fan, 1);
+    huansic_motor_set(LeftProp, 0.2);
+    huansic_motor_set(RightProp, 0.2);
 
     while(OV2640_Init()){
         printf("Camera Model Err\r\n");
@@ -53,6 +53,7 @@ int main(void) {
 	    huansic_led1_turn();
 		huansic_led2_turn();
 		printf("running, i = %d\n", i);
+		printf("fps count = %d\n", get_fps_count());
 		i++;
 		huansic_delay_ms(500);
 

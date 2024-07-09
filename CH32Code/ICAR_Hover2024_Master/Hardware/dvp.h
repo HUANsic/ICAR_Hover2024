@@ -7,5 +7,6 @@
 void DVP_Init(void);
 u8 GetGray_RGB565(u8 href, u8 row);
 u8 GetGray_YUV422(u8 href, u8 row);
+uint32_t get_fps_count();
 
 #endif
