@@ -15,8 +15,13 @@
 #include "ov.h"
 #include "usart2.h"
 #include "mco.h"
+#include "img_process.h"
+#include "pid.h"
 
-uint8_t state;
+extern uint8_t  Image_Gray[IMGH][IMGW];
+extern uint8_t  Image_Bin[IMGH][IMGW];
+
+int32_t error;
 
 int main(void) {
 	SystemCoreClockUpdate();
@@ -32,12 +37,16 @@ int main(void) {
 	mco_init();
 
 	huansic_led1_turn();
-    huansic_delay_ms(500);
+    huansic_delay_ms(300);
 
     huansic_motor_enable();
-    huansic_motor_set(Fan, 1);
-    huansic_motor_set(LeftProp, 0.2);
-    huansic_motor_set(RightProp, 0.2);
+
+    for(uint8_t i = 0; i <= 40; i++){
+        huansic_motor_set(Fan, i / 40.0);
+        huansic_motor_set(LeftProp, i / 60.0);
+        huansic_motor_set(RightProp, i / 60.0);
+        huansic_delay_ms(10);
+    }
 
     while(OV2640_Init()){
         printf("Camera Model Err\r\n");
@@ -48,14 +57,45 @@ int main(void) {
     DVP_Init();
 
     uint32_t i = 0;
+    uint32_t last_fps_count=0;
 
 	while(1) {
-	    huansic_led1_turn();
-		huansic_led2_turn();
-		printf("running, i = %d\n", i);
-		printf("fps count = %d\n", get_fps_count());
-		i++;
-		huansic_delay_ms(500);
+//	    huansic_delay_ms(500);
+//	    huansic_motor_set(Fan, 0.2 + i / 50.0);
+
+
+//		printf("gray: %d\n", Image_Gray[10][10]);
+//		printf("bin: %d\n", Image_Bin[10][10]);
+
+
+
+		if(get_fps_count() != last_fps_count){
+		    last_fps_count = get_fps_count();
+            huansic_led2_turn();
+            i++;
+            printf("running, i = %d\n", i);
+            printf("fps count = %d\n", get_fps_count());
+            printf("error: %d\n", error);
+//            UART7_SendImageBin();
+
+            binarization();
+            threhold_update();
+            Bin_Image_Filter();
+            error = get_err();
+            if(error > 0){
+                huansic_led1_set(1);
+            }
+            else{
+                huansic_led1_set(0);
+            }
+            pid_prop_update(0, error);
+		}
+//        UART7_SendImageBin();
+//        UART7_SendByte(0x01);
+
+
+//		UART7_SendByte(i);
+//		huansic_delay_ms(500);
 
 //		if(USART2_GetRxFlag() == 1){
 //            printf("%d\n", USART2_GetRxData());
@@ -69,11 +109,4 @@ int main(void) {
 
 
 	}
-}
-
-void blinkLater(uint32_t ms) {
-	huansic_chronos_schedule(huansic_chronos_milliseconds() + 2000, blinkLater);
-	huansic_led2_set(state);
-	huansic_motor_set(Fan | RightProp | LeftProp, state ? 0.1 : 0.3);
-	state = !state;
 }

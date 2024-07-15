@@ -1,5 +1,6 @@
 #include <usart2.h>
 #include "huansic_util.h"
+#include "OLED.h"
 
 u8 USART2_RxData;       //串口接收数据
 u8 USART2_RxFlag;       //串口接收标志位
@@ -9,6 +10,12 @@ u8 UART6_RxFlag;       //串口接收标志位
 
 u8 UART7_RxData;       //串口接收数据
 u8 UART7_RxFlag;       //串口接收标志位
+
+uint8_t IMGH;
+uint8_t IMGW;
+uint32_t PixelNum;
+
+uint32_t status=0;
 
 void USART2_Init(uint32_t baudrate){
     GPIO_InitTypeDef  GPIO_InitStructure;
@@ -54,9 +61,36 @@ void USART2_IRQHandler(void)
     if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET)        //判断是否是UART5的接收事件触发的中断
     {
         USART2_RxData = USART_ReceiveData(USART2);
-        if(USART2_RxData == 0x11){
+//        if(USART2_RxData == 0x11){
             USART2_RxFlag = 1;
+//            huansic_led2_turn();
+//        }
+        if(status == 0 && USART2_RxData == 0x20){
             huansic_led2_turn();
+            OLED_Clear();
+            status++;
+        }
+        else if(status == 1){
+            IMGH = USART2_RxData;
+            status++;
+        }
+        else if(status == 2){
+            IMGW = USART2_RxData;
+            status++;
+        }
+        else if(status <= IMGH * IMGW + 2){
+            if(USART2_RxData){
+                OLED_DrawPoint((status-3)%IMGW, (status-3)/IMGW);
+            }
+            status++;
+        }
+        else if(status == IMGH * IMGW + 3){
+            OLED_Update();
+            huansic_led2_turn();
+            status = 0;
+        }
+        else{
+            status = 0;
         }
         USART_ClearITPendingBit(USART2, USART_IT_RXNE);         //清除标志位
     }

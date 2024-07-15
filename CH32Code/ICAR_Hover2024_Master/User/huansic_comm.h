@@ -9,6 +9,7 @@
 #define USER_HUANSIC_COMM_H_
 
 #include "ch32v30x.h"
+#include "ov.h"
 
 typedef struct {
     int16_t front_dx;
@@ -25,5 +26,9 @@ opt_data_typedef get_opt_data(void);
 uint8_t get_subsys_data_flag(void);
 uint8_t get_subsys_data(void);
 void UART7_SendByte(uint8_t);
+void UART7_SendImageBin(void);
+
+extern uint8_t  Image_Gray[IMGH][IMGW];
+extern uint8_t  Image_Bin[IMGH][IMGW];
 
 #endif /* USER_HUANSIC_COMM_H_ */

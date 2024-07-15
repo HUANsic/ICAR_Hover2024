@@ -171,3 +171,20 @@ void UART7_SendByte(uint8_t Byte) {
     while (USART_GetFlagStatus(UART7, USART_FLAG_TXE) == RESET);   //等待发送完成
     /*下次写入数据寄存器会自动清除发送完成标志位，故此循环后，无需清除标志位*/
 }
+
+void UART7_SendImageBin(){
+    UART7_SendByte(0x20);  //帧头，发送图像数据
+    UART7_SendByte(IMGH);  //图像高度
+    UART7_SendByte(IMGW);  //图像宽度
+    for(uint8_t i = 0; i < IMGH; i++){
+        for(uint8_t j = 0; j < IMGW; j++){
+            if(Image_Bin[i][j]){
+                UART7_SendByte(0x01);
+            }
+            else{
+                UART7_SendByte(0x00);
+            }
+        }
+    }
+    UART7_SendByte(0xff);  //帧尾
+}

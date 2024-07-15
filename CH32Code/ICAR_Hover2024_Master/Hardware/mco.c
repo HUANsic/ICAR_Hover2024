@@ -8,5 +8,5 @@ void mco_init(){
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
     /* MCO Output GPIOA 8 */
-    RCC_MCOConfig(RCC_MCO_HSI);
+    RCC_MCOConfig(RCC_MCO_HSE);
 }
