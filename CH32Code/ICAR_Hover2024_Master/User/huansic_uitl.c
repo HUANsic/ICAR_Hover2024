@@ -17,7 +17,7 @@ int32_t huansic_map(int32_t input, int32_t old_floor, int32_t old_ceil, int32_t 
 	return (int32_t) percentage;
 }
 
-void huansic_led_init() {
+void util_init() {
 	// PWM pin
 	GPIO_InitTypeDef GPIO_InitStructure = { 0 };
 	TIM_OCInitTypeDef TIM_OCInitStructure = { 0 };
@@ -59,7 +59,7 @@ void huansic_led_init() {
 	GPIO_WriteBit(GPIOE, 0xFC00, Bit_RESET);
 }
 
-void huansic_led1_set(float bri) {
+void util_led_set(float bri) {
 	if (bri < 0)
 		bri = 0;
 	if (bri > 1)

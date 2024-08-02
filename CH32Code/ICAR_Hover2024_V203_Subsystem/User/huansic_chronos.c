@@ -47,7 +47,7 @@ void __huansic_systick_update_irq(void) {
 	}
 }
 
-void huansic_chronos_init(void) {
+void chronos_init(void) {
 	uint8_t i;
 	seconds = 0;
 	milliseconds = 1;
@@ -92,11 +92,11 @@ uint32_t huansic_chronos_seconds() {
 	return seconds;
 }
 
-uint32_t huansic_chronos_milliseconds() {
+uint32_t chronos_milliseconds() {
 	return milliseconds;
 }
 
-int8_t huansic_chronos_schedule(uint32_t scheduled_second, uint16_t scheduled_ms, void (*thread)(uint32_t sec, uint16_t ms)) {
+int8_t chronos_schedule(uint32_t scheduled_second, uint16_t scheduled_ms, void (*thread)(uint32_t sec, uint16_t ms)) {
 	// if time already elapsed, return -1
 	if (scheduled_second > seconds || (scheduled_second == seconds && scheduled_ms >= milliseconds))
 		return -1;

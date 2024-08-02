@@ -14,7 +14,7 @@
 
 int main(void) {
 	SystemCoreClockUpdate();
-	huansic_chronos_init();
+	chronos_init();
 	USART2_Init(115200);
 	printf("SystemClk:%d\r\n",SystemCoreClock);
     printf("ChipID:%08x\r\n", DBGMCU_GetCHIPID());

@@ -27,11 +27,11 @@ int main(void) {
 
 //    huansic_subsys_init();
 
-    huansic_led_init();
+    util_init();
     huansic_motor_init();
     huansic_motor_enable();
-	huansic_chronos_init();
-	huansic_chronos_schedule(huansic_chronos_milliseconds()+2000, blinkLater);
+	chronos_init();
+	huansic_chronos_schedule(chronos_milliseconds()+2000, blinkLater);
 
 //	huansic_led2_turn();
 //    huansic_delay_ms(500);
@@ -58,7 +58,7 @@ int main(void) {
 }
 
 void blinkLater(uint32_t ms) {
-	huansic_chronos_schedule(huansic_chronos_milliseconds() + 2000, blinkLater);
+	huansic_chronos_schedule(chronos_milliseconds() + 2000, blinkLater);
 	huansic_led2_set(state);
 	huansic_motor_set(Fan | RightProp | LeftProp, state ? 0.1 : 0.3);
 	state = !state;

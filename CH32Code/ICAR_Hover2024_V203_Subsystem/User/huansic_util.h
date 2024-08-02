@@ -18,9 +18,9 @@
 
 int32_t huansic_map(int32_t input, int32_t old_floor, int32_t old_ceil, int32_t new_floor, int32_t new_ceil);
 
-void huansic_led_init();
+void util_init();
 
-void huansic_led1_set(float bri);
+void util_led_set(float bri);
 
 void huansic_led2_set(float bri);
 
