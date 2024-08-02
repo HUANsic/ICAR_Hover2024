@@ -100,10 +100,10 @@ typedef volatile unsigned long  *PUINT32V;
 
 
 //RGB565 PIXEL 320*240
-#define RGB565_ROW_NUM   320
-#define RGB565_COL_NUM   480   //Col * 2
-#define OV2640_RGB565_HEIGHT   320
-#define OV2640_RGB565_WIDTH	   240
+#define RGB565_ROW_NUM   400
+#define RGB565_COL_NUM   600   //Col * 2
+#define OV2640_RGB565_HEIGHT   400
+#define OV2640_RGB565_WIDTH	   300
 
 #define IMGH (OV2640_RGB565_WIDTH / DOWNSCALE_RATE )
 #define IMGW (OV2640_RGB565_HEIGHT / DOWNSCALE_RATE )
@@ -161,6 +161,7 @@ void OV2640_Auto_Exposure(u8 level);
 void OV2640_Light_Mode(u8 mode);
 u8 OV2640_ImageWin_Set(u16 offx,u16 offy,u16 width,u16 height);
 u8 OV2640_ImageSize_Set(u16 width,u16 height);
+void OV2640_Window_Set(u16 sx,u16 sy,u16 width,u16 height);
 
 #endif
 

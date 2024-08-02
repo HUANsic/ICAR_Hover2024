@@ -43,8 +43,8 @@ int main(void) {
 
     for(uint8_t i = 0; i <= 40; i++){
         huansic_motor_set(Fan, i / 40.0);
-        huansic_motor_set(LeftProp, i / 60.0);
-        huansic_motor_set(RightProp, i / 60.0);
+        huansic_motor_set(LeftProp, i / 40.0);
+        huansic_motor_set(RightProp, i / 40.0);
         huansic_delay_ms(10);
     }
 
@@ -58,25 +58,39 @@ int main(void) {
 
     uint32_t i = 0;
     uint32_t last_fps_count=0;
+    uint8_t LeftPropGoal, RightPropGoal;
+    float LeftPropDuty, RightPropDuty;
 
 	while(1) {
-//	    huansic_delay_ms(500);
-//	    huansic_motor_set(Fan, 0.2 + i / 50.0);
+//	    LeftPropDuty = 1;
+//	    RightPropDuty = 1;
+//	    if(huansic_chronos_milliseconds() % 1000 <= LeftPropDuty * 1000){
+//	        LeftPropGoal = 1;
+//	    }
+//	    else{
+//	        LeftPropGoal = 0;
+//	    }
+//	    if(huansic_chronos_milliseconds() % 1000 <= RightPropDuty * 1000){
+//            RightPropGoal = 1;
+//        }
+//        else{
+//            RightPropGoal = 0;
+//        }
+//
+//	    if(GetReadingFlag() == 0){
+//	        huansic_motor_set(LeftProp, LeftPropGoal);
+//	        huansic_motor_set(RightProp, RightPropGoal);
+//	    }
 
-
-//		printf("gray: %d\n", Image_Gray[10][10]);
-//		printf("bin: %d\n", Image_Bin[10][10]);
-
-
-
-		if(get_fps_count() != last_fps_count){
+//		if(get_fps_count() != last_fps_count){
+//		    huansic_motor_set(LeftProp, 0.8);
 		    last_fps_count = get_fps_count();
             huansic_led2_turn();
             i++;
             printf("running, i = %d\n", i);
             printf("fps count = %d\n", get_fps_count());
             printf("error: %d\n", error);
-//            UART7_SendImageBin();
+            UART7_SendImageBin();
 
             binarization();
             threhold_update();
@@ -88,25 +102,10 @@ int main(void) {
             else{
                 huansic_led1_set(0);
             }
-            pid_prop_update(0, error);
-		}
-//        UART7_SendImageBin();
-//        UART7_SendByte(0x01);
-
-
-//		UART7_SendByte(i);
-//		huansic_delay_ms(500);
-
-//		if(USART2_GetRxFlag() == 1){
-//            printf("%d\n", USART2_GetRxData());
-//        }
-//		if(get_subsys_data_flag() == 1){
-//		    printf("byte data: %d\n", get_subsys_data());
-//        }
-//        UART7_SendByte(0x11);
-//		while(! get_opt_data_flag());
-//        printf("opt data: %d, %d, %d, %d\n", get_opt_data().front_dx, get_opt_data().front_dy, get_opt_data().rear_dx, get_opt_data().rear_dy);
-
-
+//            pid_prop_update(0, error);
+//            huansic_delay_ms(20);
+//            huansic_motor_set(LeftProp, 0);
+//		}
+        huansic_delay_ms(500);
 	}
 }

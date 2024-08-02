@@ -25,4 +25,8 @@ void huansic_motor_enable(void);
 
 void huansic_motor_disable(void);
 
+void huansic_motor_suspend();
+
+void huansic_motor_resume();
+
 #endif /* USER_HUANSIC_MOTOR_H_ */
