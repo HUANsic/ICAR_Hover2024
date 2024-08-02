@@ -97,3 +97,29 @@ inline void huansic_motor_enable(void) {
 inline void huansic_motor_disable(void) {
 	GPIO_WriteBit(GPIOD, GPIO_Pin_11, 0);
 }
+
+uint16_t T8CH1, T8CH2, T4CH1, T4CH2, T4CH3, T4CH4;
+
+void huansic_motor_suspend(){
+    T8CH1 = TIM8->CH1CVR;
+    T8CH2 = TIM8->CH2CVR;
+    T4CH1 = TIM4->CH1CVR;
+    T4CH2 = TIM4->CH2CVR;
+    T4CH3 = TIM4->CH3CVR;
+    T4CH4 = TIM4->CH4CVR;
+    TIM8->CH1CVR = 0;
+    TIM8->CH2CVR = 0;
+    TIM4->CH1CVR = 0;
+    TIM4->CH2CVR = 0;
+    TIM4->CH3CVR = 0;
+    TIM4->CH4CVR = 0;
+}
+
+void huansic_motor_resume(){
+    TIM8->CH1CVR = T8CH1;
+    TIM8->CH2CVR = T8CH2;
+    TIM4->CH1CVR = T4CH1;
+    TIM4->CH2CVR = T4CH2;
+    TIM4->CH3CVR = T4CH3;
+    TIM4->CH4CVR = T4CH4;
+}

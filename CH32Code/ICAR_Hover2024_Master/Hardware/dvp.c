@@ -1,21 +1,53 @@
 #include <dvp.h>
 #include <OLED.h>
+#include "huansic_util.h"
+#include "huansic_motor.h"
 
 /* DVP Work Mode */
 #define RGB565_MODE   0
 /* DVP Work Mode Selection */
 #define DVP_Work_Mode    RGB565_MODE
 
+uint32_t fps_count;
+
+uint16_t threhold=25;
+
 UINT32  JPEG_DVPDMAaddr0 = 0x20005000;
 UINT32  JPEG_DVPDMAaddr1 = 0x20005000 + OV2640_JPEG_WIDTH;
 
-UINT32  RGB565_DVPDMAaddr0 = 0x2000A000;
-UINT32  RGB565_DVPDMAaddr1 = 0x2000A000 + RGB565_COL_NUM;
+//UINT32  RGB565_DVPDMAaddr0 = 0x2000A000;
+//UINT32  RGB565_DVPDMAaddr1 = 0x2000A000 + RGB565_COL_NUM;
+
+uint8_t Image_data[2][RGB565_COL_NUM];
+UINT32  RGB565_DVPDMAaddr0 = (uint32_t)Image_data[0];
+UINT32  RGB565_DVPDMAaddr1 = (uint32_t)Image_data[1];
+
+uint8_t Image_Gray[IMGH][IMGW];
+uint32_t Image_Gray_Address = (uint32_t)Image_Gray;
+uint8_t Image_Bin[IMGH][IMGW];
+uint32_t Image_Bin_Address = (uint32_t)Image_Bin;
 
 
 volatile UINT32 frame_cnt = 0;
 volatile UINT32 addr_cnt = 0;       //当前列数
 volatile UINT32 href_cnt = 0;       //当前行数
+
+volatile uint8_t reading_flag = 0;
+
+uint32_t get_fps_count(){
+    return fps_count;
+}
+
+void binarization(){
+    for(uint16_t i = 0; i < IMGH; i++){
+        for(uint16_t j = 0; j < IMGW; j++){
+            if(Image_Gray[i][j] > threhold){
+                Image_Bin[i][j] = 1;
+            }
+            else Image_Bin[i][j] = 0;
+        }
+    }
+}
 
 void DVP_IRQHandler (void) __attribute__((interrupt("WCH-Interrupt-fast")));
 
@@ -66,28 +98,35 @@ u32 DVP_ROW_cnt=0;
  * @return  none
  */
 void DVP_IRQHandler(void){
+    huansic_led5_turn();
     if (DVP->IFR & RB_DVP_IF_ROW_DONE){      //行结束中断
         DVP->IFR &= ~RB_DVP_IF_ROW_DONE;  //clear Interrupt
-        DVP->CR0 &= ~RB_DVP_ENABLE;  //disable DVP
+//        DVP->CR0 &= ~RB_DVP_ENABLE;  //disable DVP
         if (addr_cnt%2){     //buf1 done
             addr_cnt++;
-            for(int i=0;i<RGB565_COL_NUM;i+=5){
-                if(!(href_cnt%5) && GetGray_RGB565(1, i) > 35){
-                    OLED_DrawPoint(i/5, href_cnt/5);
+            for(int i=0;i<OV2640_RGB565_WIDTH;i+=5){
+                if(!(href_cnt%5)){
+                    Image_Gray[OV2640_RGB565_WIDTH/5 - i/5][href_cnt/5] = GetGray_RGB565(1, i);
+                    if(GetGray_RGB565(1, i) > 25){
+//                        OLED_DrawPoint(href_cnt/5, OV2640_RGB565_WIDTH/5 - i/5);
+                    }
                 }
             }
             //DVP->DMA_BUF1 += RGB565_COL_NUM * 2;
         }
         else{                //buf0 done
             addr_cnt++;
-            for(int i=0;i<RGB565_COL_NUM;i+=5){
-                if(!(href_cnt%5) && GetGray_RGB565(0, i) > 35){
-                    OLED_DrawPoint(i/5, href_cnt/5);
+            for(int i=0;i<OV2640_RGB565_WIDTH;i+=5){
+                if(!(href_cnt%5)){
+                    Image_Gray[OV2640_RGB565_WIDTH/5 - i/5][href_cnt/5] = GetGray_RGB565(0, i);
+                    if(GetGray_RGB565(0, i) > 25){
+//                        OLED_DrawPoint(href_cnt/5, OV2640_RGB565_WIDTH/5 - i/5);
+                    }
                 }
             }
             //DVP->DMA_BUF0 += RGB565_COL_NUM * 2;
         }
-        DVP->CR0 |= RB_DVP_ENABLE;  //enable DVP
+//        DVP->CR0 |= RB_DVP_ENABLE;  //enable DVP
         href_cnt++;         //行计数器加1
     }
 
@@ -97,15 +136,18 @@ void DVP_IRQHandler(void){
         DVP->DMA_BUF1 = RGB565_DVPDMAaddr1;      //DMA addr1
         addr_cnt = 0;
         href_cnt = 0;
-        DVP->CR0 &= ~RB_DVP_ENABLE;  //disable DVP
-        OLED_Update();
-        OLED_Clear();
-        DVP->CR0 |= RB_DVP_ENABLE;  //enable DVP
+//        DVP->CR0 &= ~RB_DVP_ENABLE;  //disable DVP
+//        OLED_Update();
+//        OLED_Clear();
+        fps_count++;
+//        DVP->CR0 |= RB_DVP_ENABLE;  //enable DVP
+        reading_flag = 0;
     }
 
     if (DVP->IFR & RB_DVP_IF_STR_FRM){       //帧开始中断
         DVP->IFR &= ~RB_DVP_IF_STR_FRM;  //clear Interrupt
         frame_cnt++;                        //帧数计数器加1
+        reading_flag = 1;
     }
 
     if (DVP->IFR & RB_DVP_IF_STP_FRM){       //帧结束中断标志
@@ -118,7 +160,9 @@ void DVP_IRQHandler(void){
     }
 }
 
-
+uint8_t GetReadingFlag(){
+    return reading_flag;
+}
 
 
 u8 GetGray_RGB565(u8 href, u8 row){

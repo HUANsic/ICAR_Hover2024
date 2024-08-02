@@ -1,4 +1,6 @@
 #include <usart2.h>
+#include "huansic_util.h"
+#include "OLED.h"
 
 u8 USART2_RxData;       //串口接收数据
 u8 USART2_RxFlag;       //串口接收标志位
@@ -8,6 +10,12 @@ u8 UART6_RxFlag;       //串口接收标志位
 
 u8 UART7_RxData;       //串口接收数据
 u8 UART7_RxFlag;       //串口接收标志位
+
+uint8_t IMGH;
+uint8_t IMGW;
+uint32_t PixelNum;
+
+uint32_t status=0;
 
 void USART2_Init(uint32_t baudrate){
     GPIO_InitTypeDef  GPIO_InitStructure;
@@ -53,7 +61,37 @@ void USART2_IRQHandler(void)
     if (USART_GetITStatus(USART2, USART_IT_RXNE) == SET)        //判断是否是UART5的接收事件触发的中断
     {
         USART2_RxData = USART_ReceiveData(USART2);
-        USART2_RxFlag = 1;
+//        if(USART2_RxData == 0x11){
+            USART2_RxFlag = 1;
+//            huansic_led2_turn();
+//        }
+        if(status == 0 && USART2_RxData == 0x20){
+            huansic_led2_turn();
+            OLED_Clear();
+            status++;
+        }
+        else if(status == 1){
+            IMGH = USART2_RxData;
+            status++;
+        }
+        else if(status == 2){
+            IMGW = USART2_RxData;
+            status++;
+        }
+        else if(status <= IMGH * IMGW + 2){
+            if(USART2_RxData){
+                OLED_DrawPoint((status-3)%IMGW, (status-3)/IMGW);
+            }
+            status++;
+        }
+        else if(status == IMGH * IMGW + 3){
+            OLED_Update();
+            huansic_led2_turn();
+            status = 0;
+        }
+        else{
+            status = 0;
+        }
         USART_ClearITPendingBit(USART2, USART_IT_RXNE);         //清除标志位
     }
 }
@@ -88,6 +126,25 @@ void Serial_SendByte(uint8_t Byte)
     USART_SendData(USART2, Byte);       //将字节数据写入数据寄存器，写入后USART自动生成时序波形
     while (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET);   //等待发送完成
     /*下次写入数据寄存器会自动清除发送完成标志位，故此循环后，无需清除标志位*/
+}
+
+void Serial_SendByteData(uint8_t Byte) {
+    Serial_SendByte(0x00);
+    Serial_SendByte(Byte);
+    Serial_SendByte(0xff);
+}
+
+void Serial_SendSensorData(opt_data_typedef opt_data) {
+    Serial_SendByte(0x01);
+    Serial_SendByte((uint16_t)opt_data.front_dx >> 8);
+    Serial_SendByte((uint16_t)opt_data.front_dx);
+    Serial_SendByte((uint16_t)opt_data.front_dy >> 8);
+    Serial_SendByte((uint16_t)opt_data.front_dy);
+    Serial_SendByte((uint16_t)opt_data.rear_dx >> 8);
+    Serial_SendByte((uint16_t)opt_data.rear_dx);
+    Serial_SendByte((uint16_t)opt_data.rear_dy >> 8);
+    Serial_SendByte((uint16_t)opt_data.rear_dy);
+    Serial_SendByte(0x8f);
 }
 
 

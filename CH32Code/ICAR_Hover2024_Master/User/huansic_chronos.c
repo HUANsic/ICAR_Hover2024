@@ -8,6 +8,7 @@
 #include "huansic_chronos.h"
 
 volatile uint32_t milliseconds;
+volatile uint32_t microseconds;
 
 struct Reminder {
 	uint32_t scheduled_ms;
@@ -34,7 +35,8 @@ void huansic_chronos_init(void) {
 	SysTick->SR = 0;
 	SysTick->CNT = 0;
 	// update every millisecond
-	SysTick->CMP = SystemCoreClock / 1000 - 1;
+//	SysTick->CMP = SystemCoreClock / 1000 - 1;
+	SysTick->CMP = SystemCoreClock / 1000000 - 1;
 	// start SysTick
 	SysTick->CTLR = 0xF;
 	// enable interrupt
@@ -47,16 +49,35 @@ void huansic_delay_ms(uint32_t duration) {
 	while(milliseconds - start < duration);
 }
 
-void huansic_delay_us(uint16_t duration) {
-	uint32_t temp = duration, i;
-	temp *= SystemCoreClock / 1000000;	// total CPU cycles
-	if (temp < 30)
-		return;		// can't make it that precise, probably already elapsed
-	temp -= 30;		// idk, feel like it
-	temp /= 5;		// for loop count
+//void huansic_delay_us(uint16_t duration) {
+//	uint32_t temp = duration, i=0;
+//	temp *= SystemCoreClock / 1000000;	// total CPU cycles
+//	if (temp < 30)
+//		return;		// can't make it that precise, probably already elapsed
+//	temp -= 30;		// idk, feel like it
+//	temp /= 5;		// for loop count
+//
+//	for (i = 0; i < temp; i++)
+//		;
+//}
 
-	for (i = 0; i < temp; i++)
-		;
+//void huansic_delay_us(u16 time)
+//{
+//   u16 i=0;
+//   while(time--)
+//   {
+//      i=10;
+//      while(i--) ;
+//   }
+//}
+
+void huansic_delay_us(uint32_t duration) {
+    uint32_t start_ms = milliseconds;
+    uint16_t duration_ms = duration / 1000;
+    uint16_t duration_us = duration % 1000;
+    while(milliseconds - start_ms < duration_ms);
+    uint32_t start_us = 0; microseconds = 0;
+    while(microseconds - start_us < duration_us);
 }
 
 uint32_t huansic_chronos_milliseconds() {
@@ -120,7 +141,11 @@ int8_t huansic_chronos_schedule(uint32_t scheduled_ms, void (*thread)(uint32_t m
 }
 
 void __huansic_systick_update_irq(void) {
-	milliseconds++;
+    microseconds++;
+    if(microseconds >= 1000){
+        milliseconds++;
+        microseconds = 0;
+    }
 	// push the wheel
 	if (wheel[next] < REMINDER_LENGTH) {
 		while (reminders[wheel[next]].scheduled_ms <= milliseconds) {
