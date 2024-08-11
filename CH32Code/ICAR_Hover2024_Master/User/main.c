@@ -16,22 +16,23 @@
 //#include "usart2.h"
 
 uint8_t state;
+float dc = 0;
 void blinkLater(uint32_t ms);
 int main(void) {
 	SystemCoreClockUpdate();
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-    //USART_Printf_Init(115200);
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+	//USART_Printf_Init(115200);
 //    USART2_Init(115200);
 //    printf("SystemClk:%d\r\n",SystemCoreClock);
 //    printf("ChipID:%08x\r\n", DBGMCU_GetCHIPID());
 
 //    huansic_subsys_init();
 
-    util_init();
-    huansic_motor_init();
-    huansic_motor_enable();
-	chronos_init();
-	huansic_chronos_schedule(chronos_milliseconds()+2000, blinkLater);
+	util_init();
+	huansic_motor_init();
+	huansic_motor_enable();
+	huansic_chronos_init();
+	huansic_chronos_schedule(huansic_chronos_milliseconds() + 500, blinkLater);
 
 //	huansic_led2_turn();
 //    huansic_delay_ms(500);
@@ -58,8 +59,11 @@ int main(void) {
 }
 
 void blinkLater(uint32_t ms) {
-	huansic_chronos_schedule(chronos_milliseconds() + 2000, blinkLater);
-	huansic_led2_set(state);
-	huansic_motor_set(Fan | RightProp | LeftProp, state ? 0.1 : 0.3);
+	huansic_chronos_schedule(huansic_chronos_milliseconds() + 2000, blinkLater);
+	util_led2_set(state);
+	dc = dc + 0.1;
+	if(dc == 1)
+		dc = 0;
+	huansic_motor_set(Fan | RightProp | LeftProp, state ? -0.1 : -0.3);/*state ? 0.1 : 0.3*/
 	state = !state;
 }

@@ -63,29 +63,29 @@ void huansic_motor_set(MotorName motor, float val) {
 	val = val > 1 ? 1 : (val < -1 ? -1 : val);		// constrain
 	if (motor & Fan) {
 		if (val < 0) {
-			TIM8->CH1CVR = 0;
+			TIM8->CH1CVR = 1;
 			TIM8->CH2CVR = (uint16_t) (-val * 3840);
 		} else {
 			TIM8->CH1CVR = (uint16_t) (val * 3840);
-			TIM8->CH2CVR = 0;
+			TIM8->CH2CVR = 1;
 		}
 	}
 	if (motor & LeftProp) {
 		if (val < 0) {
-			TIM4->CH1CVR = 0;
+			TIM4->CH1CVR = 1;
 			TIM4->CH2CVR = (uint16_t) (-val * 3840);
 		} else {
 			TIM4->CH1CVR = (uint16_t) (val * 3840);
-			TIM4->CH2CVR = 0;
+			TIM4->CH2CVR = 1;
 		}
 	}
 	if (motor & RightProp) {
 		if (val < 0) {
-			TIM4->CH3CVR = 0;
+			TIM4->CH3CVR = 1;
 			TIM4->CH4CVR = (uint16_t) (-val * 3840);
 		} else {
 			TIM4->CH3CVR = (uint16_t) (val * 3840);
-			TIM4->CH4CVR = 0;
+			TIM4->CH4CVR = 1;
 		}
 	}
 }
