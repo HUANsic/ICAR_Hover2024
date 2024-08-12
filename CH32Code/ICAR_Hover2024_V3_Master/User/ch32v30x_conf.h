@@ -12,6 +12,10 @@
 #ifndef __CH32V30x_CONF_H
 #define __CH32V30x_CONF_H
 
+#define SYSCLK_FREQ_144MHz_HSE  144000000
+//#define SYSCLK_FREQ_96MHz_HSE  96000000
+//#define SYSCLK_FREQ_144MHz_HSI  144000000
+
 #include "ch32v30x_adc.h"
 #include "ch32v30x_bkp.h"
 #include "ch32v30x_can.h"

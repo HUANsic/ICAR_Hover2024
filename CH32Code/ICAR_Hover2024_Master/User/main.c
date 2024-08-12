@@ -64,6 +64,6 @@ void blinkLater(uint32_t ms) {
 	dc = dc + 0.1;
 	if(dc == 1)
 		dc = 0;
-	huansic_motor_set(Fan | RightProp | LeftProp, state ? -0.1 : -0.3);/*state ? 0.1 : 0.3*/
+	huansic_motor_set(Fan | RightProp | LeftProp, state ? -0.3 : -0.8);/*state ? 0.1 : 0.3*/
 	state = !state;
 }

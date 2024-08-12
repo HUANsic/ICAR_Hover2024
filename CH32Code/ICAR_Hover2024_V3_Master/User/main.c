@@ -1,14 +1,14 @@
 /********************************** (C) COPYRIGHT *******************************
-* File Name          : main.c
-* Author             : WCH
-* Version            : V1.0.0
-* Date               : 2021/06/06
-* Description        : Main program body.
-*********************************************************************************
-* Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
-* Attention: This software (modified or not) and binary are used for 
-* microcontroller manufactured by Nanjing Qinheng Microelectronics.
-*******************************************************************************/
+ * File Name          : main.c
+ * Author             : WCH
+ * Version            : V1.0.0
+ * Date               : 2021/06/06
+ * Description        : Main program body.
+ *********************************************************************************
+ * Copyright (c) 2021 Nanjing Qinheng Microelectronics Co., Ltd.
+ * Attention: This software (modified or not) and binary are used for
+ * microcontroller manufactured by Nanjing Qinheng Microelectronics.
+ *******************************************************************************/
 
 /*
  *@Note
@@ -16,17 +16,15 @@
  USART1_Tx(PA9).
  This example demonstrates using USART1(PA9) as a print debug port output.
 
-*/
+ */
 
-#include "debug.h"
-
+#include "huansic_utility.h"
 
 /* Global typedef */
 
 /* Global define */
 
 /* Global Variable */
-
 
 /*********************************************************************
  * @fn      main
@@ -38,16 +36,16 @@
 int main(void)
 {
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
-	SystemCoreClockUpdate();
-	Delay_Init();
-	USART_Printf_Init(115200);	
-	printf("SystemClk:%d\r\n",SystemCoreClock);
-	printf( "ChipID:%08x\r\n", DBGMCU_GetCHIPID() );
-	printf("This is printf example\r\n");
+	Utility_Init();
+	Utility_Time_DelayUs(100);
 
-	while(1)
-    {
-
+	while(1) {
+		Utility_LED_Set(LED1, 0.1);
+//		Utility_Time_DelayMs(500);
+		Utility_Time_DelayUs(500000);
+		Utility_LED_Set(LED1, 0.9);
+//		Utility_Time_DelayMs(500);
+		Utility_Time_DelayUs(500000);
 	}
 }
 
